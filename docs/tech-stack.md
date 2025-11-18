@@ -65,10 +65,10 @@ AWS Bedrock, DynamoDB, Lambda
 - Global cache for 5K common words (Bedrock, Lambda)
 - LLM generation for non-cached word templates (Bedrock, Lambda, DynamoDB)
 - Templates that users can edit & save to personal collection (DynamoDB)
+- Build LLM assistant - Bedrock, fine tuning
 
 ## MVP V2: Article processing & AI Q&A assistant + Scaling
 - Create multiple templated notes at once from a single media source
-- Build LLM assistant - Bedrock, fine tuning
 - Implement spaced repetition system (SRS) - fsrs ibrary
 - Keep track of different media supporting vocab words
 - User Authentication (via Google)
