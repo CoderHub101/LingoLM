@@ -53,7 +53,9 @@ CREATE TABLE contexts (
 Hosted on Vercel, React Native frontend
 
 ### Backend
-Flask backend, Lambda for event driven calls (the actual functions), EC2 is for MVP V2 when scale matters
+Backend
+MVP V1: Lambda for serverless API calls
+MVP V2: Lambda and Flask & EC2 for scalability
 
 ### Databases
 NoSQL database for user info (DynamoDB) and Vector database for 5K global cache (Postgres + PGVector)
