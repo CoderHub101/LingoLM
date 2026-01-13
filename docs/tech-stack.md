@@ -53,7 +53,6 @@ CREATE TABLE contexts (
 Hosted on Vercel, React Native frontend
 
 ### Backend
-Backend
 - MVP V1: Lambda for serverless API calls
 - MVP V2: Lambda and Flask & EC2 for scalability
 
