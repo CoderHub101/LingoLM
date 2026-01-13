@@ -54,8 +54,8 @@ Hosted on Vercel, React Native frontend
 
 ### Backend
 Backend
-MVP V1: Lambda for serverless API calls
-MVP V2: Lambda and Flask & EC2 for scalability
+- MVP V1: Lambda for serverless API calls
+- MVP V2: Lambda and Flask & EC2 for scalability
 
 ### Databases
 NoSQL database for user info (DynamoDB) and Vector database for 5K global cache (Postgres + PGVector)
