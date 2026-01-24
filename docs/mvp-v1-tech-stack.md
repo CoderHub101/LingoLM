@@ -38,7 +38,7 @@ Implement MVP v1 in the cheapest and simplest way possible:
 - Lookup uses lazy caching:
   - WordCache hit: return cached base card JSON
   - WordCache miss: call Bedrock -> store base card -> return
-- Save stores a user-owned copy (UserCards) that can diverge from the base card
+- Stores a user-owned copy (UserCards) that can diverge from the base card
 - Chat calls Bedrock with (base card + user edits + notes + question) and returns an answer
 
 ## Data Storage
