@@ -3,7 +3,6 @@
   "language": "string", 
   "lemma": "string",
   "normalizedLemma": "string",
-
   "partOfSpeech": "string",
   "otherForms": [
     {
