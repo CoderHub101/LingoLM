@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-cream: #F8F5F0;
+  --color-ink: #1A1A1A;
+  --color-sage: #7A8B7F;
+  --color-terracotta: #D4745F;
+  --color-sand: #E6DDD3;
+  --color-ochre: #C89F5E;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: 'Outfit', sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: var(--color-ochre);
+  color: white;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-sand);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-sage);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-terracotta);
+}
+
+/* Utility classes */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .glass-effect {
+    background: rgba(248, 245, 240, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .shadow-custom {
+    box-shadow: 0 4px 20px rgba(26, 26, 26, 0.08);
+  }
+  
+  .shadow-custom-lg {
+    box-shadow: 0 10px 40px rgba(26, 26, 26, 0.12);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-ink text-cream px-6 py-3 rounded-full font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply bg-sage text-white px-6 py-3 rounded-full font-medium transition-all duration-300 hover:bg-opacity-90 hover:shadow-lg active:scale-95;
+  }
+  
+  .card {
+    @apply bg-white rounded-2xl p-6 shadow-custom transition-all duration-300 hover:shadow-custom-lg;
+  }
+  
+  .input-field {
+    @apply w-full bg-white border-2 border-sand px-4 py-3 rounded-xl font-sans text-ink placeholder-sage/50 transition-all duration-300 focus:outline-none focus:border-sage focus:ring-4 focus:ring-sage/10;
+  }
+}
