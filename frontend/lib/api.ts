@@ -42,7 +42,7 @@ class ApiClient {
     }
 
     if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`
+      (headers as Record<string, string>)['Authorization'] = `Bearer ${this.token}`
     }
 
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
@@ -57,28 +57,21 @@ class ApiClient {
     return response.json()
   }
 
-  // GET /lookup?lang=&lemma=
+  // GET /cardLookup?lang=&lemma=
   async lookup({ lang, lemma }: LookupParams) {
-    return this.request(`/lookup?lang=${lang}&lemma=${encodeURIComponent(lemma)}`)
+    return this.request(`/cardLookup?lang=${lang}&lemma=${encodeURIComponent(lemma)}`)
   }
 
-  // POST /cards (create/update user card)
-  async createCard(params: CreateCardParams) {
-    return this.request('/cards', {
-      method: 'POST',
-      body: JSON.stringify(params),
+  // GET /allCards (list user cards)
+  async getCards(userId: string) {
+    return this.request('/allCards', {
+      headers: { 'x-user-id': userId }
     })
-  }
-
-  // GET /cards (list user cards)
-  async getCards(userId?: string) {
-    const query = userId ? `?userId=${userId}` : ''
-    return this.request(`/cards${query}`)
   }
 
   // POST /chat (nuance Q&A for a word/card)
   async chat(params: ChatParams) {
-    return this.request('/chat', {
+    return this.request('/chatNuance', {
       method: 'POST',
       body: JSON.stringify(params),
     })

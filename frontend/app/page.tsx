@@ -1,4 +1,5 @@
 'use client'
+import { apiClient } from '@/lib/api'
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -13,35 +14,31 @@ export default function LookupPage() {
   const [isSearching, setIsSearching] = useState(false)
   const [showChat, setShowChat] = useState(false)
   
-  const languages = ['Spanish', 'French', 'German', 'Italian', 'Portuguese', 'Japanese', 'Korean', 'Mandarin']
-  
+const languageCodes: Record<string, string> = {
+  'Spanish': 'es', 'French': 'fr', 'German': 'de', 'Italian': 'it',
+  'Portuguese': 'pt', 'Japanese': 'ja', 'Korean': 'ko', 'Mandarin': 'zh'
+}
+
   const handleSearch = async () => {
     if (!searchQuery.trim()) return
-    
     setIsSearching(true)
-    
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const data = await apiClient.lookup({ lang: languageCodes[selectedLanguage], lemma: searchQuery.trim() })
+      const card = data.card
       setSearchResult({
-        word: searchQuery,
+        word: card.lemma || searchQuery,
         language: selectedLanguage,
-        partOfSpeech: 'verb',
-        definitions: [
-          'To move or go from one place to another',
-          'To make a journey, especially of some length or abroad',
-          'To move or proceed in a particular direction'
-        ],
-        examples: [
-          'We plan to travel to Europe next summer for three weeks.',
-          'She travels frequently for work, visiting different cities each month.',
-          'Light travels faster than sound through different mediums.'
-        ],
-        relatedWords: ['journey', 'voyage', 'trip', 'trek', 'wander', 'roam']
+        partOfSpeech: card.partOfSpeech,
+        definitions: [card.shortDefinition],
+        examples: card.examples.map((e: { src: string; tgt: string }) => ({ src: e.src, tgt: e.tgt })),
+        relatedWords: card.relatedWords || []
       })
+    } catch {
+      alert('Word not found. Try another word.')
+    } finally {
       setIsSearching(false)
-    }, 1200)
-  }
-  
+    }
+  }  
   const handleSave = () => {
     alert('Card saved to your collection!')
   }
@@ -91,7 +88,7 @@ export default function LookupPage() {
                 Select Language
               </label>
               <div className="flex flex-wrap gap-2">
-                {languages.map((lang) => (
+                {Object.keys(languageCodes).map((lang) => (
                   <motion.button
                     key={lang}
                     onClick={() => setSelectedLanguage(lang)}
@@ -183,7 +180,7 @@ export default function LookupPage() {
                   word={searchResult.word}
                   language={searchResult.language}
                   definitions={searchResult.definitions}
-                  examples={searchResult.examples}
+                  examples={searchResult.examples.map((e: { src: string; tgt: string }) => ({ src: e.src, tgt: e.tgt }))}
                   relatedWords={searchResult.relatedWords}
                   partOfSpeech={searchResult.partOfSpeech}
                   onSave={handleSave}
