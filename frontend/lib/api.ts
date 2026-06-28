@@ -8,9 +8,7 @@ export interface LookupParams {
   lemma: string
 }
 
-export interface CreateCardParams {
-  lang: string
-  lemma: string
+export interface CreateCardParams extends LookupParams {
   card: any
   notes?: string
 }
@@ -69,7 +67,7 @@ class ApiClient {
     })
   }
 
-  // POST /chat (nuance Q&A for a word/card)
+  // POST /chatNuance (nuance Q&A for a word/card)
   async chat(params: ChatParams) {
     return this.request('/chatNuance', {
       method: 'POST',

@@ -9,7 +9,7 @@ import ChatAssistant from '@/components/ChatAssistant'
 
 export default function LookupPage() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedLanguage, setSelectedLanguage] = useState('Spanish')
+  const [selectedLanguage, setSelectedLanguage] = useState('')
   const [searchResult, setSearchResult] = useState<any>(null)
   const [isSearching, setIsSearching] = useState(false)
   const [showChat, setShowChat] = useState(false)
@@ -126,7 +126,7 @@ const languageCodes: Record<string, string> = {
               
               <motion.button
                 onClick={handleSearch}
-                disabled={isSearching || !searchQuery.trim()}
+                disabled={isSearching || !searchQuery.trim() || !selectedLanguage}
                 className="btn-primary text-lg px-8 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -180,7 +180,7 @@ const languageCodes: Record<string, string> = {
                   word={searchResult.word}
                   language={searchResult.language}
                   definitions={searchResult.definitions}
-                  examples={searchResult.examples.map((e: { src: string; tgt: string }) => ({ src: e.src, tgt: e.tgt }))}
+                  examples={searchResult.examples}
                   relatedWords={searchResult.relatedWords}
                   partOfSpeech={searchResult.partOfSpeech}
                   onSave={handleSave}
