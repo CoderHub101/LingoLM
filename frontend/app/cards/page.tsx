@@ -10,7 +10,7 @@ interface SavedCard {
   word: string
   language: string
   definitions: string[]
-  examples: string[]
+  examples: { src: string; tgt: string }[]
   relatedWords: string[]
   partOfSpeech: string
   notes: string
@@ -37,9 +37,9 @@ export default function SavedCardsPage() {
         'To go on a trip'
       ],
       examples: [
-        'Me gusta viajar por el mundo.',
-        'Vamos a viajar a España el próximo verano.',
-        'Ella viaja mucho por su trabajo.'
+        { src: 'Me gusta viajar por el mundo.', tgt: 'I like to travel the world.' },
+        { src: 'Vamos a viajar a España el próximo verano.', tgt: 'We are going to travel to Spain next summer.' },
+        { src: 'Ella viaja mucho por su trabajo.', tgt: 'She travels a lot for work.' }
       ],
       relatedWords: ['viaje', 'viajero', 'travesía', 'recorrer'],
       notes: 'Remember: irregular conjugation in present tense. Similar to English "voyage".',
@@ -57,9 +57,9 @@ export default function SavedCardsPage() {
         'To thrive emotionally or personally'
       ],
       examples: [
-        "Les fleurs s'épanouissent au printemps.",
-        "Elle s'épanouit dans son nouveau travail.",
-        'Un enfant a besoin de temps pour s\'épanouir.'
+        { src: "Les fleurs s'épanouissent au printemps.", tgt: 'The flowers blossom in spring.' },
+        { src: "Elle s'épanouit dans son nouveau travail.", tgt: 'She is flourishing in her new job.' },
+        { src: "Un enfant a besoin de temps pour s'épanouir.", tgt: 'A child needs time to develop fully.' }
       ],
       relatedWords: ['épanouissement', 'fleurir', 'développer', 'prospérer'],
       notes: 'Beautiful word with no direct English equivalent. Used both literally (flowers) and figuratively (personal growth).',
@@ -77,9 +77,9 @@ export default function SavedCardsPage() {
         'Nostalgia for one\'s homeland'
       ],
       examples: [
-        'Nach drei Monaten im Ausland bekam er Heimweh.',
-        'Heimweh ist ein Gefühl, das viele Reisende kennen.',
-        'Sie litt unter starkem Heimweh.'
+        { src: 'Nach drei Monaten im Ausland bekam er Heimweh.', tgt: 'After three months abroad, he got homesick.' },
+        { src: 'Heimweh ist ein Gefühl, das viele Reisende kennen.', tgt: 'Homesickness is a feeling that many travelers know.' },
+        { src: 'Sie litt unter starkem Heimweh.', tgt: 'She suffered from severe homesickness.' }
       ],
       relatedWords: ['Fernweh', 'Sehnsucht', 'Nostalgie'],
       notes: 'Compound word: Heim (home) + Weh (pain). Contrast with Fernweh (wanderlust).',

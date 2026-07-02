@@ -7,7 +7,7 @@ interface VocabularyCardProps {
   word: string
   language: string
   definitions: string[]
-  examples: string[]
+  examples: { src: string; tgt: string }[]
   relatedWords: string[]
   partOfSpeech?: string
   onSave?: () => void
@@ -125,8 +125,11 @@ export default function VocabularyCard({
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.6 + idx * 0.1 }}
             >
-              <p className="text-ink/80 italic leading-relaxed">
-                "{example}"
+              <p className="text-ink italic leading-relaxed">
+                "{example.src}"
+              </p>
+              <p className="text-sage leading-relaxed mt-1">
+                "{example.tgt}"
               </p>
             </motion.div>
           ))}
