@@ -13,7 +13,7 @@ Implement MVP v1 in the cheapest and simplest way possible:
 
 ## Architecture Summary
 - Client: Web app (responsive)
-- Auth: Amazon Cognito with Google IdP
+- Auth: Direct Google OAuth 2.0
 - API: Amazon API Gateway (HTTP API) + AWS Lambda
 - Data: DynamoDB only (WordCache + UserCards)
 - LLM: Amazon Bedrock (structured JSON generation for base cards; chat for nuance Q&A)
@@ -27,7 +27,7 @@ Implement MVP v1 in the cheapest and simplest way possible:
 
 ## Backend
 - API Gateway (HTTP API) + Lambda
-- API Gateway uses a Cognito JWT authorizer for protected routes
+- API Gateway validates Google-issued tokens or app session identity for protected routes
 ### Lambda functions (recommended)
 - GET /lookup?lang=&lemma=
 - POST /cards (create/update user card)
