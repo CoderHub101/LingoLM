@@ -25,3 +25,4 @@ pnpm-debug.log*
 Thumbs.db
 .vscode/
 .idea/
+/frontend/.next
