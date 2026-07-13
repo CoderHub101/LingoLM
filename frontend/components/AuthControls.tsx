@@ -64,6 +64,7 @@ export default function AuthControls() {
       router.replace('/')
       router.refresh()
     } catch {
+      // Direct navigation is a fallback if the JavaScript request fails or is interrupted.
       window.location.assign('/api/auth/logout')
     } finally {
       setIsLoggingOut(false)

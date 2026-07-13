@@ -32,6 +32,7 @@ export async function getSessionFromIdToken(idToken?: string): Promise<SessionSt
   }
 
   try {
+    // Verify Google's signature, issuer, and this app's client ID before trusting user details.
     const { payload } = await jwtVerify(idToken, getJwks(auth.jwksUri), {
       issuer: GOOGLE_ISSUERS,
       audience: auth.clientId,
@@ -47,6 +48,7 @@ export async function getSessionFromIdToken(idToken?: string): Promise<SessionSt
 }
 
 function getJwks(jwksUri: string) {
+  // Reuse Google's public signing keys instead of creating a new remote key loader per request.
   const existing = jwksCache.get(jwksUri)
   if (existing) {
     return existing

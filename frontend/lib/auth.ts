@@ -58,6 +58,8 @@ export function buildAuthSetupMessage() {
 }
 
 function getRequestOrigin(req: NextRequest) {
+  // Netlify forwards the public host and protocol because Next.js runs behind its proxy.
+  // Using them keeps the OAuth callback on the same domain where login started.
   const forwardedHost = req.headers.get('x-forwarded-host') ?? req.headers.get('host')
   const forwardedProto = req.headers.get('x-forwarded-proto')
 

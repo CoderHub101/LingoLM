@@ -42,6 +42,7 @@ export async function GET(req: NextRequest) {
   const expectedState = req.cookies.get('oauth_state')?.value
   const verifier = req.cookies.get('pkce_verifier')?.value
 
+  // A missing cookie often means login started on a different Netlify domain than this callback.
   if (!expectedState || !verifier || expectedState !== state) {
     return NextResponse.redirect(
       new URL(`/auth/error?message=${encodeURIComponent('Invalid state/PKCE')}`, url)
@@ -61,6 +62,7 @@ export async function GET(req: NextRequest) {
   let tokenStatus = 500
 
   try {
+    // Exchange Google's one-time authorization code for the tokens used by this app.
     const tokenResp = await fetch(auth.tokenEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -104,6 +106,7 @@ export async function GET(req: NextRequest) {
   const secure = process.env.NODE_ENV === 'production'
   const res = NextResponse.redirect(new URL(auth.postLoginRedirect, url))
 
+  // HttpOnly keeps tokens unavailable to browser JavaScript while still sending them to our API.
   res.cookies.set('access_token', tokenJson.access_token, {
     httpOnly: true,
     sameSite: 'lax',
@@ -129,6 +132,7 @@ export async function GET(req: NextRequest) {
     })
   }
 
+  // State and PKCE are single-use protections, so remove them after a successful exchange.
   for (const cookieName of ['oauth_state', 'pkce_verifier']) {
     res.cookies.set(cookieName, '', {
       httpOnly: true,

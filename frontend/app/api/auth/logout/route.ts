@@ -23,6 +23,7 @@ function buildLogoutResponse(req: NextRequest, json = false) {
   return res
 }
 
+// GET supports direct navigation; POST lets the client clear cookies without leaving the page first.
 export async function GET(req: NextRequest) {
   return buildLogoutResponse(req, false)
 }

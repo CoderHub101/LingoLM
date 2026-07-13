@@ -27,6 +27,8 @@ export async function GET(req: NextRequest) {
   const switchAccount = url.searchParams.get('switch_account') === '1'
   const prompt = switchAccount ? 'select_account' : undefined
 
+  // State protects the callback from forged requests. PKCE proves that the callback belongs
+  // to this login attempt without sending the private verifier to Google during this redirect.
   const state = base64url(crypto.randomBytes(16))
   const verifier = base64url(crypto.randomBytes(32))
   const challenge = base64url(sha256(verifier))
@@ -48,6 +50,7 @@ export async function GET(req: NextRequest) {
   const res = NextResponse.redirect(authorizeUrl)
   const secure = process.env.NODE_ENV === 'production'
 
+  // These short-lived, server-only cookies are checked when Google redirects back.
   res.cookies.set('oauth_state', state, {
     httpOnly: true,
     sameSite: 'lax',
