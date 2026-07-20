@@ -1,3 +1,5 @@
+Deployed URL (frontend only so far): https://lingolm.netlify.app/
+
 # Language Learning Platform
 AI-powered vocabulary learning platform that auto-populates customizable notes with definitions, examples, and context - so learners can focus on understanding instead of manual data entry.
 
