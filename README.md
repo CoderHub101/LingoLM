@@ -1,4 +1,4 @@
-[Deployed site](https://lingolm.netlify.app/){:target="_blank"}
+<a href="https://lingolm.netlify.app/" target="_blank">Deployed site</a>
 
 # Language Learning Platform
 AI-powered vocabulary learning platform that auto-populates customizable notes with definitions, examples, and context - so learners can focus on understanding instead of manual data entry.
