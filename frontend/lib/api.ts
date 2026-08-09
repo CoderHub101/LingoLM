@@ -1,5 +1,6 @@
 // lib/api.ts
 // API utilities for connecting to the backend Lambda functions
+import type { BaseCard, CardLookupResponse, UserCard } from '@/types/vocabulary'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'
 
@@ -8,15 +9,15 @@ export interface LookupParams {
   lemma: string
 }
 
-export interface CreateCardParams extends LookupParams {
-  card: any
+export interface CreateCardParams {
+  baseCard: BaseCard
   notes?: string
 }
 
 export interface ChatParams {
   word: string
-  baseCard: any
-  userEdits?: any
+  baseCard: BaseCard
+  userEdits?: Partial<UserCard['content']>
   notes?: string
   question: string
 }
@@ -33,7 +34,7 @@ class ApiClient {
     this.token = token
   }
 
-  private async request(endpoint: string, options: RequestInit = {}) {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       ...options.headers,
@@ -52,33 +53,51 @@ class ApiClient {
       throw new Error(`API error: ${response.status} ${response.statusText}`)
     }
 
-    return response.json()
+    return response.json() as Promise<T>
   }
 
   // GET /cardLookup?lang=&lemma=
-  async lookup({ lang, lemma }: LookupParams) {
-    return this.request(`/cardLookup?lang=${lang}&lemma=${encodeURIComponent(lemma)}`)
+  async lookup({ lang, lemma }: LookupParams): Promise<CardLookupResponse> {
+    return this.request<CardLookupResponse>(`/cardLookup?lang=${encodeURIComponent(lang)}&lemma=${encodeURIComponent(lemma)}`)
   }
 
   // GET /allCards (list user cards)
-  async getCards(userId: string) {
-    return this.request('/allCards', {
+  async getCards(userId: string): Promise<{ cards: UserCard[] }> {
+    return this.request<{ cards: UserCard[] }>('/allCards', {
       headers: { 'x-user-id': userId }
     })
   }
 
   // POST /chatNuance (nuance Q&A for a word/card)
-  async chat(params: ChatParams) {
-    return this.request('/chatNuance', {
+  async chat(params: ChatParams): Promise<{ response: string }> {
+    return this.request<{ response: string }>('/chatNuance', {
       method: 'POST',
       body: JSON.stringify(params),
     })
   }
 
   // DELETE /cards/:cardId
-  async deleteCard(cardId: string) {
-    return this.request(`/cards/${cardId}`, {
+  async deleteCard(cardId: string): Promise<void> {
+    return this.request<void>(`/cards/${encodeURIComponent(cardId)}`, {
       method: 'DELETE',
+    })
+  }
+
+  // POST /cards — create a user-owned card from a BaseCard lookup result.
+  async saveCard(params: CreateCardParams): Promise<{ card: UserCard }> {
+    return this.request<{ card: UserCard }>('/cards', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    })
+  }
+
+  /**
+   * Restores user-editable learning content from the referenced BaseCard.
+   * The backend preserves cardId, userId, createdAt, and baseRef.
+   */
+  async resetCard(cardId: string): Promise<{ card: UserCard }> {
+    return this.request<{ card: UserCard }>(`/cards/${encodeURIComponent(cardId)}/reset`, {
+      method: 'POST',
     })
   }
 }

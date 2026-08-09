@@ -6,11 +6,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Navigation from '@/components/Navigation'
 import VocabularyCard from '@/components/VocabularyCard'
 import ChatAssistant from '@/components/ChatAssistant'
+import type { BaseCard } from '@/types/vocabulary'
 
 export default function LookupPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedLanguage, setSelectedLanguage] = useState('')
-  const [searchResult, setSearchResult] = useState<any>(null)
+  const [searchResult, setSearchResult] = useState<BaseCard | null>(null)
   const [isSearching, setIsSearching] = useState(false)
   const [showChat, setShowChat] = useState(false)
   
@@ -24,15 +25,7 @@ const languageCodes: Record<string, string> = {
     setIsSearching(true)
     try {
       const data = await apiClient.lookup({ lang: languageCodes[selectedLanguage], lemma: searchQuery.trim() })
-      const card = data.card
-      setSearchResult({
-        word: card.lemma || searchQuery,
-        language: selectedLanguage,
-        partOfSpeech: card.partOfSpeech,
-        definitions: [card.shortDefinition],
-        examples: card.examples.map((e: { src: string; tgt: string }) => ({ src: e.src, tgt: e.tgt })),
-        relatedWords: card.relatedWords || []
-      })
+      setSearchResult(data.card)
     } catch {
       alert('Word not found. Try another word.')
     } finally {
@@ -177,12 +170,12 @@ const languageCodes: Record<string, string> = {
                 transition={{ duration: 0.5 }}
               >
                 <VocabularyCard
-                  word={searchResult.word}
+                  word={searchResult.lemma}
                   language={searchResult.language}
-                  definitions={searchResult.definitions}
-                  examples={searchResult.examples}
-                  relatedWords={searchResult.relatedWords}
-                  partOfSpeech={searchResult.partOfSpeech}
+                  definitions={searchResult.definitions.map((definition) => definition.text)}
+                  examples={searchResult.examples.map((example) => ({ src: example.source, tgt: example.translation }))}
+                  relatedWords={(searchResult.relatedWords || []).map((relatedWord) => relatedWord.lemma)}
+                  partOfSpeech={searchResult.definitions[0]?.partOfSpeech}
                   onSave={handleSave}
                 />
                 
@@ -244,7 +237,7 @@ const languageCodes: Record<string, string> = {
       <AnimatePresence>
         {showChat && searchResult && (
           <ChatAssistant
-            word={searchResult.word}
+            word={searchResult.lemma}
             onClose={() => setShowChat(false)}
           />
         )}
