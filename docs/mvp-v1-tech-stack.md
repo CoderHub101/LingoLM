@@ -1,4 +1,4 @@
-# LingoLM MVP v1 Tech Stack (Recommended)
+# LingoLM MVP v1 Tech Stack Rewritten
 
 ## Goal
 Implement MVP v1 in the cheapest and simplest way possible:
@@ -15,8 +15,9 @@ Implement MVP v1 in the cheapest and simplest way possible:
 - Client: Web app (responsive)
 - Auth: Direct Google OAuth 2.0
 - API: Amazon API Gateway (HTTP API) + AWS Lambda
-- Data: DynamoDB only (WordCache + UserCards)
-- LLM: Amazon Bedrock (structured JSON generation for base cards; chat for nuance Q&A)
+- Persistent Storage: DynamoDB (UserCards + Dictionary)
+- Cache: AWS ElastiCache (WordCache with TTL)
+- LLM: Gemini 3.5 Flash (example sentence generation and fallback word generation)
 - Observability: CloudWatch Logs + basic metrics
 
 ## Frontend
@@ -34,53 +35,71 @@ Implement MVP v1 in the cheapest and simplest way possible:
 - GET /cards (list user cards)
 - POST /chat (nuance Q&A for a word/card)
 
-### Core behaviors
-- Lookup uses lazy caching:
-  - WordCache hit: return cached base card JSON
-  - WordCache miss: call Bedrock -> store base card -> return
-- Stores a user-owned copy (UserCards) that can diverge from the base card
-- Chat calls Bedrock with (base card + user edits + notes + question) and returns an answer
+### Word Lookup Flow
+When a user searches for a word:
+1. Check WordCache (ElastiCache)
+   - If the word exists in cache, immediately return the cached card.
+2. Check Dictionary (DynamoDB)
+   - If found:
+      - Retrieve the dictionary entry.
+      - Generate example sentence(s) using Gemini 3.5 Flash.
+      - Assemble the complete card.
+      - Cache the result in WordCache (with TTL).
+      - Return the card.
+3. Dictionary Miss
+   - Generate the entire card using Gemini 3.5 Flash.
+   - (Post-MVP: generated entries should be validated before permanent inclusion in the dictionary.)
+   - Cache the generated card in WordCache (with TTL).
+   - Return the generated card.
+4. User Saves the Word
+   - Store a user-owned copy of the card in UserCards.
+   - User modifications remain independent of future cache updates.
+
 
 ## Data Storage
-### DynamoDB tables
-1) WordCache (global)
-- Partition key: PK = LANG#{lang}
-- Sort key:      SK = LEMMA#{lemma}
-- Attributes:
-  - baseCard (Map)
-  - generatedAt (ISO string)
-  - modelId (string)
-  - promptVersion (string)
-  - schemaVersion (string)
+1. Dictionary
+Stores curated dictionary entries used for vocabulary lookups.
+- Partition Key
+  - langLemma
+- Attributes
+  - lang
+  - lemma
+  - definitions
+  - parts of speech
+  - translations (if applicable)
+  - metadata
+Example sentences are generated dynamically by Gemini rather than stored in the dictionary.
 
-2) UserCards (per-user)
-- Partition key: PK = USER#{userId}
-- Sort key:      SK = CARD#{lang}#{lemma}#{cardId}
-- Attributes:
-  - lang (string)
-  - lemma (string)
-  - card (Map)          # user-editable structured fields
-  - notes (string)
-  - createdAt (ISO string)
-  - updatedAt (ISO string)
-  - baseRef:
-      - cachePK (string)
-      - cacheSK (string)
-      - schemaVersion (string)
-      - promptVersion (string)
 
-### Notes on schema
-- Store card bodies as DynamoDB Map types (not stringified JSON)
-- Version fields allow safe migrations and gradual regeneration of cached cards
+2. UserCards
+Stores user-owned vocabulary cards.
+- Partition Key
+  - PK = USER#{userId}
+- Sort Key
+  - SK = CARD#{lang}#{lemma}#{cardId}
+- Attributes
+  - lang
+  - lemma
+  - card (Map)
+  - notes
+  - createdAt
+  - updatedAt
 
-## Bedrock Usage (No RAG in v1)
-### Base card generation
-- Bedrock generates a structured “base card” JSON for a lemma using a strict schema and deterministic prompt
-- No embeddings, no vector database, no retrieval pipeline
+## LLM Usage
+### Dictionary Entries
+For words found in the dictionary:
+- Gemini 3.5 Flash generates natural example sentence(s).
+- The generated examples are combined with the dictionary entry before being returned.
+### Fallback Generation
+For words not found in the dictionary:
+- Gemini 3.5 Flash generates a complete vocabulary card.
+- Generated cards are cached for future lookups.
+- Future versions may include a validation pipeline before adding generated entries to the permanent dictionary.
+
 
 ### Nuance Q&A
-- Bedrock answers user questions using:
-  - base card
+- Gemini answers user questions using:
+  - dictionary information or generated card 
   - user edits
   - user notes
 
@@ -89,6 +108,7 @@ Implement MVP v1 in the cheapest and simplest way possible:
 - Avoid embeddings/vector search until there is a real corpus and a clear retrieval need
 - Keep a single backend deployment model (API Gateway + Lambda)
 - Use DynamoDB as the only persistent store in v1
+- Use cache expiration (TTL) rather than manual cache management whenever possible.
 
 ## v2 Roadmap Hooks
 - Article ingestion pipeline: paste article -> extract candidate words -> batch card generation
